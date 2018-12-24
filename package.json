@@ -1,0 +1,26 @@
+{
+  "name": "areyoupositive",
+  "version": "1.0.0",
+  "description": "A simple math game in which you attempt to make all nodes contain positive numbers",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "This Guy Studios",
+  "license": "MIT",
+  "dependencies": {
+    "@storybook/addon-actions": "^4.1.3",
+    "@storybook/addon-knobs": "^4.1.3",
+    "@storybook/addon-storyshots": "^4.1.3",
+    "@storybook/addons": "^4.1.3",
+    "@storybook/vue": "^4.1.3",
+    "axios": "^0.18.0",
+    "express": "^4.16.4"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "babel-loader": "^8.0.4",
+    "webpack": "^4.28.2",
+    "webpack-cli": "^3.1.2"
+  }
+}
