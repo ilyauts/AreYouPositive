@@ -10,6 +10,10 @@
 </template>
 
 <script>
+// General
+import { mapGetters, mapActions, mapState } from "vuex";
+
+// Components
 import Node from "./Node.vue";
 
 export default {
@@ -27,9 +31,9 @@ export default {
     this.generateNodes.call(this);
   },
   beforeDestroy() {},
-  mounted() {
-  },
+  mounted() {},
   methods: {
+    ...mapActions(["addNode"]),
     generateNodes() {
       let attempts = 0;
 
@@ -37,11 +41,17 @@ export default {
         let obj = {
           top: this.generateNum(),
           left: this.generateNum(),
-          value: this.generateInt(10)
+          value: this.generateInt(10),
+          nodeId: this.generateNodeId(),
+          connections: []
         };
 
         if (this.farEnoughAway(obj)) {
+          // Create node visually
           this.nodeLocations.push(obj);
+
+          // Create state for node
+          this.addNode(obj);
         }
       } while (this.nodeLocations.length < this.numNodes || attempts++ < 100);
     },
@@ -80,6 +90,17 @@ export default {
       max = max ? max : 100;
 
       return Math.floor(Math.random() * max);
+    },
+    generateNodeId(length) {
+        length = (length) ? length: 10;
+
+        const domain = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+        let nodeId = '';
+        for(var i = 0; i < length; ++i) {
+            nodeId += domain[this.generateInt(domain.length)];
+        }
+
+        return nodeId;
     }
   }
 };

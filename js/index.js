@@ -4,7 +4,7 @@ import VueRouter from 'vue-router';
 
 // Components
 import Main from '../components/Main.vue';
-// import store from '../store/store';
+import store from '../store/store';
 
 class Index {
     constructor() {
@@ -18,10 +18,9 @@ class Index {
             mode: 'history',
             base: __dirname,
             routes: [{
-                    path: '/',
-                    component: Main,
-                }
-            ],
+                path: '/',
+                component: Main,
+            }],
         });
 
         const app = new Vue({
@@ -33,7 +32,7 @@ class Index {
             data: {
                 currentRoute: window.location.pathname,
             },
-            //   store,
+            store,
             computed: {},
             beforeMount() {
                 axios.interceptors.request.use((config) => {
