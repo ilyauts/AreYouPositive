@@ -1,30 +1,28 @@
 <template>
-  <div class="node" :style="{left, top}"></div>
+  <div class="node" :style="{left, top}">
+    <div class="value">{{location.value}}</div>
+  </div>
 </template>
 
 <script>
-
 export default {
-  components: {
-  },
-  props: ['location', 'radius'],
+  components: {},
+  props: ["location", "radius", "value"],
   data() {
     return {};
   },
   beforeMount() {},
   beforeDestroy() {},
-  mounted() {
-  },
-  methods: {
-  },
+  mounted() {},
+  methods: {},
   computed: {
-      left() {
-          return `calc(${this.location.left}vw)`;
-      },
+    left() {
+      return `calc(${this.location.left}vw)`;
+    },
 
-      top() {
-          return `calc(${this.location.top}vh)`;
-      }
+    top() {
+      return `calc(${this.location.top}vh)`;
+    }
   }
 };
 </script>
@@ -36,8 +34,17 @@ export default {
   width: 10vw;
   height: 10vw;
   border-radius: 100vw;
-  box-shadow: 0 0 5px 0px rgba(0,0,0,.7);
+  box-shadow: 0 0 5px 0px rgba(0, 0, 0, 0.7);
   background-color: $orange;
   position: absolute;
+  overflow: hidden;
+  vertical-align: middle;
+}
+.value {
+  text-align: center;
+  color: $dark-blue;
+  font-size: 3vw;
+  margin: auto;
+  margin-top: 3.2vw;
 }
 </style>

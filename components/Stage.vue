@@ -28,7 +28,6 @@ export default {
   },
   beforeDestroy() {},
   mounted() {
-    console.log(this.nodeLocations);
   },
   methods: {
     generateNodes() {
@@ -37,7 +36,8 @@ export default {
       do {
         let obj = {
           top: this.generateNum(),
-          left: this.generateNum()
+          left: this.generateNum(),
+          value: this.generateInt(10)
         };
 
         if (this.farEnoughAway(obj)) {
@@ -65,12 +65,9 @@ export default {
           ) <
           this.nodeRadius * 6
         ) {
-          console.log(potential);
           return false;
         }
       }
-
-      console.log("good", potential);
 
       return true;
     },
@@ -78,6 +75,11 @@ export default {
       max = max ? max : 100;
 
       return Math.floor(Math.random() * max * 100) / 100;
+    },
+    generateInt(max) {
+      max = max ? max : 100;
+
+      return Math.floor(Math.random() * max);
     }
   }
 };
