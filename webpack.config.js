@@ -1,18 +1,13 @@
-const ExtractTextPlugin = require('extract-text-webpack-plugin'),
+const VueLoaderPlugin = require('vue-loader/lib/plugin'),
   webpack = require('webpack'),
-  path = require('path'),
-  autoprefixer = require('autoprefixer'),
-  bootstrapEntryPoints = require('./webpack.bootstrap.config.js'),
-  UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+  path = require('path');
 
 module.exports = {
   entry: {
-    Home: ['babel-polyfill', bootstrapEntryPoints.prod, './js/app/Home'],
-    Swagger: ['babel-polyfill', bootstrapEntryPoints.prod, './js/app/Swagger'],
-    Main: ['babel-polyfill','tether', bootstrapEntryPoints.prod, './js/app/Main']
+    bundle: ['babel-polyfill', './js/index'],
   },
   output: {
-    path: path.join(__dirname, 'dist'),
+    path: path.join(__dirname, 'public'),
     filename: '[name].js',
     chunkFilename: '[name].js'
   },
@@ -22,7 +17,7 @@ module.exports = {
         exclude: /node_modules/,
         loader: 'babel-loader',
         query: {
-          presets: ['env']
+          presets: ['@babel/preset-env']
         },
       },
       {
@@ -47,55 +42,27 @@ module.exports = {
         test: /\.(ttf|eot|svg|jpg|png|jpeg|mp4)(\?[\s\S]+)?$/,
         loader: 'file-loader',
         options: {
-          publicPath: 'dist/'
+          publicPath: 'public/'
         }
-      },
-      {
-        test: /bootstrap\/dist\/js\/umd\//,
-        use: 'imports-loader?jQuery=jquery',
       },
       {
         test: /\.vue$/,
         loader: 'vue-loader',
-        options: {
-        }
+        options: {}
       }
     ],
   },
   plugins: [
-    new ExtractTextPlugin({
-      filename: 'styles.css',
-      allChunks: true
-    }),
     new webpack.ProvidePlugin({
-      $: 'jquery',
-      jQuery: 'jquery',
-      'window.jQuery': 'jquery',
       Tether: 'tether',
-      'window.Tether': 'tether',
-      Alert: 'exports-loader?Alert!bootstrap/js/dist/alert',
-      Button: 'exports-loader?Button!bootstrap/js/dist/button',
-      Carousel: 'exports-loader?Carousel!bootstrap/js/dist/carousel',
-      Clipboard: 'clipboard',
-      Collapse: 'exports-loader?Collapse!bootstrap/js/dist/collapse',
-      Cookies: 'js-cookie',
-      Dropdown: 'exports-loader?Dropdown!bootstrap/js/dist/dropdown',
-      Modal: 'exports-loader?Modal!bootstrap/js/dist/modal',
-      Popper: ['popper.js', 'default'],
-      Popover: 'exports-loader?Popover!bootstrap/js/dist/popover',
-      Scrollspy: 'exports-loader?Scrollspy!bootstrap/js/dist/scrollspy',
-      Tab: 'exports-loader?Tab!bootstrap/js/dist/tab',
-      Tooltip: 'exports-loader?Tooltip!bootstrap/js/dist/tooltip',
-      Util: 'exports-loader?Util!bootstrap/js/dist/util',
-      Validator: 'bootstrap-validator'
+      'window.Tether': 'tether'
     }),
-    new webpack.LoaderOptionsPlugin({
-      postcss: [autoprefixer],
-    })
+    new VueLoaderPlugin()
   ],
   resolve: {
     alias: {
-      vue: 'vue/dist/vue.min.js',
+      vue$: 'vue/dist/vue.esm.js',
+
     },
   },
   stats: {
@@ -103,25 +70,5 @@ module.exports = {
   },
   node: {
     fs: "empty"
- }
+  }
 };
-
-if(process.env.WEBSITE_HOSTNAME && process.env.WEBSITE_HOSTNAME.match('roarfrontend-prod')){
-  module.exports.plugins.push(new UglifyJsPlugin({
-    uglifyOptions: {
-      mangle: { toplevel: true },
-      compress: {
-        toplevel: true
-      },
-      output: {
-        beautify: false
-      }
-    }
-  }));
-}
-
-// Do not bundle analyze when not local (= in concourse or on Azure) or if I say so (docker build)
-if(!(process.env.NO_WBA || process.env.IN_CONCOURSE || process.env.WEBSITE_HOSTNAME || process.env.NODE_ENV == 'production')){
-  var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-  module.exports.plugins.push(new BundleAnalyzerPlugin());
-}

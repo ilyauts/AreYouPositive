@@ -9,6 +9,8 @@ server.use(bodyParser.urlencoded({ // to support URL-encoded bodies
 
 // Serve all from public
 server.use(express.static('public'));
+server.use(express.static('js'));
+server.use(express.static('components'));
 server.use(express.static(__dirname + '../public'));
 server.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -24,6 +26,6 @@ server.get('/ping', (req, res) => {
   })
 });
 
-server.listen(process.env.PORT || 5555, () => {
-  console.log('Are You Positive now listening on port', process.env.PORT || 7289);
+server.listen(process.env.PORT || 7288, () => {
+  console.log('Are You Positive now listening on port', process.env.PORT || 7288);
 });
