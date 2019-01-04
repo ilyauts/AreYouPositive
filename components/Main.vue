@@ -45,18 +45,18 @@ export default {
   font-size: 0.75em;
   width: 100%;
   text-align: right;
-  color: $lightest-blue;
+  color: $dark-gray;
 }
 .footer p {
-    margin-right: 1vw;
-    margin-bottom: 1vh;
+  margin-right: 1vw;
+  margin-bottom: 1vh;
 }
 .footer p a {
-    color: $orange;
-    text-decoration: none;
+  color: $orange;
+  text-decoration: none;
 }
 .footer p a:hover {
-    color: $light-orange;
-    text-decoration: none;
+  color: $light-orange;
+  text-decoration: none;
 }
 </style>
