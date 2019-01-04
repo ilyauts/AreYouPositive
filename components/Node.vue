@@ -2,7 +2,7 @@
   <div class="node" :style="{left, top}">
     <div class="value">
       <div class="minus" v-on:click="giveWrapper">-</div>
-      <span>{{node.value}}</span>
+      <span>{{integerValue}}</span>
       <div class="plus" v-on:click="takeWrapper">+</div>
     </div>
   </div>
@@ -11,16 +11,21 @@
 <script>
 // General
 import { mapGetters, mapActions, mapState } from "vuex";
+import { TweenLite } from "gsap/TweenLite";
 
 export default {
   components: {},
   props: ["nodeId", "radius"],
   data() {
-    return {};
+    return {
+      tweenedValue: 0
+    };
   },
   beforeMount() {},
   beforeDestroy() {},
-  mounted() {},
+  mounted() {
+    TweenLite.to(this.$data, 0.5, { tweenedValue: this.node.value});
+  },
   methods: {
     ...mapActions(["give", "take"]),
     giveWrapper() {
@@ -52,6 +57,17 @@ export default {
         return "0vh";
       }
       return `calc(${this.node.top}vh)`;
+    },
+    integerValue() {
+      return this.tweenedValue.toFixed(0);
+    }
+  },
+  watch: {
+    node: {
+      handler(newNode) {
+        TweenLite.to(this.$data, 0.5, { tweenedValue: newNode.value });
+      },
+      deep: true
     }
   }
 };
@@ -118,5 +134,9 @@ export default {
   &:hover {
     background-color: $lightest-green;
   }
+}
+
+.value span {
+  transition: 500ms linear all;
 }
 </style>

@@ -15,6 +15,8 @@
         :y1="connection.y1"
         :y2="connection.y2"
         class="connection"
+        :data-lineNum="parseFloat(connection.x1)-parseFloat(connection.x2)"
+        v-on:click="printLineNum"
       ></line>
     </svg>
   </div>
@@ -46,14 +48,17 @@ export default {
   beforeDestroy() {},
   mounted() {
     let main = document.getElementById("main");
+
     // Determine x where xvh = 1vw
-    console.log(main, main.clientWidth, main.clientHeight);
     this.scale = main.clientWidth / main.clientHeight;
 
     this.generateNodes.call(this);
   },
   methods: {
     ...mapActions(["addNode"]),
+    printLineNum(e) {
+      console.log(e.target.dataset.lineNum);
+    },
     generateNodes() {
       let attempts = 0,
         nodeArray = [];
@@ -176,7 +181,6 @@ export default {
 
           // Ensure that this is the first time we're making this connection
           if (!connectionsMade.includes(arr.join("-"))) {
-
             let scaleRadius = this.nodeRadius * this.scale;
             connectionsMade.push({
               x1: a.left + this.nodeRadius + "vw",
@@ -235,33 +239,30 @@ export default {
         }
       }
 
-console.log('todelete', toDelete);
+      console.log("todelete", toDelete);
       // Loop through the array and delete any old connections
-      for (let i = (this.connections.length - 1); i >= 0; --i) {
+      for (let i = this.connections.length - 1; i >= 0; --i) {
         if (toDelete.includes(i)) {
           this.connections.splice(i, 1);
         }
       }
     },
     doesItIntersect(obj1, obj2) {
-      console.log(
-        obj1,
-        obj2,
-        parseFloat(obj1.y1),
-        parseFloat(obj1.y2),
-        parseFloat(obj1.x1),
-        parseFloat(obj1.x2)
-      );
-      // Slopes
-      let slope1 =
-          (parseFloat(obj1.y2) - parseFloat(obj1.y1)) /
-          (parseFloat(obj1.x2) - parseFloat(obj1.x1)),
-        slope2 =
-          (parseFloat(obj2.y2) - parseFloat(obj2.y1)) /
-          (parseFloat(obj2.x2) - parseFloat(obj2.x1));
+      let ob1x1 = parseFloat(obj1.x1),
+        ob1x2 = parseFloat(obj1.x2),
+        ob2x1 = parseFloat(obj2.x1),
+        ob2x2 = parseFloat(obj2.x2),
+        ob1y1 = parseFloat(obj1.y1),
+        ob1y2 = parseFloat(obj1.y2),
+        ob2y1 = parseFloat(obj2.y1),
+        ob2y2 = parseFloat(obj2.y2);
 
-      let c1 = slope1 * parseFloat(obj1.x1) - parseFloat(obj2.y1),
-        c2 = slope2 * parseFloat(obj2.x1) - parseFloat(obj2.y1);
+      // Slopes
+      let slope1 = (ob1y2 - ob1y1) / (ob1x2 - ob1x1),
+        slope2 = (ob2y2 - ob2y1) / (ob2x2 - ob2x1);
+
+      let c1 = (slope1 * ob1x1 - ob2y1) * -1,
+        c2 = (slope2 * ob2x1 - ob2y1) * -1;
 
       let slopeDiff = slope1 - slope2;
 
@@ -275,16 +276,14 @@ console.log('todelete', toDelete);
       let x = (c2 - c1) / (slope1 - slope2);
 
       // Determine the x value
-      console.log(111, slope1, slope2, c1, c2, x);
+      // console.log(111, slope1, slope2, c1, c2, x);
 
       // Ensure that the visible portions of both lines are the only things considered
-      if (
-        x > parseFloat(obj1.x1) &&
-        x < parseFloat(obj1.x2) &&
-        x > parseFloat(obj2.x1) &&
-        x < parseFloat(obj2.x2)
-      ) {
-        return true;
+      console.log(ob1x1-ob1x2);
+      if (x > ob1x1 && x < ob1x2 && x > ob2x1 && x < ob2x2) {
+        console.log(ob1x1-ob1x2, 'delete', 232123213);
+        // return true;
+        return false;
       }
 
       return false;
@@ -306,8 +305,8 @@ console.log('todelete', toDelete);
   top: 0;
 }
 .connection {
-  stroke:$lightest-blue;
-  stroke-width:5;
+  stroke: $lightest-blue;
+  stroke-width: 5;
   cursor: pointer;
 
   &:hover {
