@@ -15,7 +15,9 @@
         :y1="connection.y1"
         :y2="connection.y2"
         class="connection"
-        :data-lineNum="parseFloat(connection.x1)-parseFloat(connection.x2)"
+        :data-lineNum="parseFloat(connection.x2)-parseFloat(connection.x1)"
+        :data-x1="parseFloat(connection.x1)"
+        :data-x2="parseFloat(connection.x2)"
         v-on:click="printLineNum"
       ></line>
     </svg>
@@ -53,11 +55,29 @@ export default {
     this.scale = main.clientWidth / main.clientHeight;
 
     this.generateNodes.call(this);
+
+    this.randomizeValues();
   },
   methods: {
-    ...mapActions(["addNode"]),
+    ...mapActions(["addNode", "give", "take"]),
     printLineNum(e) {
-      console.log(e.target.dataset.lineNum);
+      console.log(
+        e.target.dataset.lineNum,
+        e.target.dataset.x1,
+        e.target.dataset.x2
+      );
+    },
+    randomizeValues() {
+      // Loop through all nodes and randomly act
+      let numActions = this.generateInt(1000);
+
+      for (let i = 0; i < numActions; ++i) {
+        if (this.generateInt(2)) {
+          this.give(this.nodeLocations[this.generateInt(this.numNodes)]);
+        } else {
+          this.take(this.nodeLocations[this.generateInt(this.numNodes)]);
+        }
+      }
     },
     generateNodes() {
       let attempts = 0,
@@ -80,8 +100,8 @@ export default {
 
       // Determine the connections
       for (let objIndex in nodeArray) {
-        // Always have at least one connection
-        let numConnections = this.generateInt(nodeArray.length - 2) + 1;
+        // Always have at least one connection, assumming at least 3 nodes!!!
+        let numConnections = this.generateInt(2) + 1;
 
         // Allowable connections
         let allowableConnections = Array.from(
@@ -279,15 +299,32 @@ export default {
       // console.log(111, slope1, slope2, c1, c2, x);
 
       // Ensure that the visible portions of both lines are the only things considered
-      console.log(ob1x1-ob1x2);
-      if (x > ob1x1 && x < ob1x2 && x > ob2x1 && x < ob2x2) {
-        console.log(ob1x1-ob1x2, 'delete', 232123213);
+      // TODO: make this if statement work!
+      console.log(ob1x1 - ob1x2, ob1x1, ob2x1, ob1x2, ob2x2);
+      if (
+        x > this.smallest(ob1x1, ob1x2) &&
+        x < this.largest(ob1x1, ob1x2) &&
+        x > this.smallest(ob2x1, ob2x2) &&
+        x < this.largest(ob2x1, ob2x2)
+      ) {
+        // console.log(ob1x1-ob1x2, 'delete', 232123213);
         // return true;
         return false;
       }
 
       return false;
+    },
+    smallest(a, b) {
+      return a > b ? b : a;
+    },
+    largest(a, b) {
+      return a > b ? a : b;
     }
+  },
+  computed: {
+    ...mapGetters({
+      getNodes: "getNodes"
+    })
   }
 };
 </script>
