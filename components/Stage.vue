@@ -6,6 +6,17 @@
       :location="nodeLocation"
       :radius="nodeRadius"
     ></Node>
+    <svg height="100vh" width="100vw">
+      <line
+        v-for="connection in connections"
+        :key="connection"
+        :x1="connection.x1"
+        :x2="connection.x2"
+        :y1="connection.y1"
+        :y2="connection.y2"
+        style="stroke:#515aad;stroke-width:5"
+      ></line>
+    </svg>
   </div>
 </template>
 
@@ -24,7 +35,8 @@ export default {
     return {
       nodeRadius: 5,
       numNodes: 5,
-      nodeLocations: []
+      nodeLocations: [],
+      connections: []
     };
   },
   beforeMount() {
@@ -55,7 +67,8 @@ export default {
 
       // Determine the connections
       for (let objIndex in nodeArray) {
-        let numConnections = this.generateInt(nodeArray.length - 1);
+        // Always have at least one connection
+        let numConnections = this.generateInt(nodeArray.length - 2) + 1;
 
         // Allowable connections
         let allowableConnections = Array.from(
@@ -100,7 +113,8 @@ export default {
       // Create nodes visually
       this.nodeLocations = nodeArray;
 
-      console.log(nodeArray);
+      // Create connections visually
+      this.createConnections(nodeArray);
 
       // Create state for nodes
       for (let obj of nodeArray) {
@@ -133,6 +147,40 @@ export default {
 
       return true;
     },
+    createConnections() {
+      let connectionsMade = [];
+      for (let node of this.nodeLocations) {
+        for (let cnct of node.connections) {
+          let arr = [node.nodeId, cnct].sort();
+
+          let a, b;
+
+          if (arr[0] === node.nodeId) {
+            a = node;
+            b = this.nodeLocations.find(element => element.nodeId === cnct);
+          } else {
+            a = this.nodeLocations.find(element => element.nodeId === cnct);
+            b = node;
+          }
+
+          console.log("a", a, "b", b);
+
+          // Ensure that this is the first time we're making this connection
+          if (!connectionsMade.includes(arr.join("-"))) {
+            connectionsMade.push({
+              x1: a.left + this.nodeRadius + "vw",
+              x2: b.left + this.nodeRadius + "vw",
+              y1: `calc(${a.top}vh + ${this.nodeRadius}vw)`,
+              y2: `calc(${b.top}vh + ${this.nodeRadius}vw)`
+            });
+          }
+        }
+      }
+
+      // Update state
+      this.connections = connectionsMade;
+    },
+    drawConnections() {},
     generateNum(max) {
       max = max ? max : 100;
 
