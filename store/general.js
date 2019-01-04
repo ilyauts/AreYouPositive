@@ -7,12 +7,14 @@ const getters = {
 };
 
 const mutations = {
-    take(state, nodeId) {
+    take(state, {
+        nodeId
+    }) {
 
         let nodesCopy = {
-                ...nodes
+                ...state.nodes
             },
-            myNode = nodesCopy.nodes[nodeId];
+            myNode = nodesCopy[nodeId];
 
         // Ensure it exists
         if (myNode) {
@@ -30,12 +32,14 @@ const mutations = {
         state.nodes = nodesCopy;
     },
 
-    give(state, nodeId) {
+    give(state, {
+        nodeId
+    }) {
 
         let nodesCopy = {
-                ...nodes
+                ...state.nodes
             },
-            myNode = nodesCopy.nodes[nodeId];
+            myNode = nodesCopy[nodeId];
 
         // Ensure it exists
         if (myNode) {
@@ -53,17 +57,14 @@ const mutations = {
         state.nodes = nodesCopy;
     },
 
-    addNode(state, { nodeId, value, connections }) {
+    addNode(state, node) {
         // Create a copy of the nodes
         let nodesCopy = {
             ...state.nodes
         };
 
         // Add a node
-        nodesCopy[nodeId] = {
-            value,
-            connections
-        };
+        nodesCopy[node.nodeId] = node;
 
         // Update state
         state.nodes = nodesCopy;
@@ -72,17 +73,13 @@ const mutations = {
 
 const actions = {
     // Take one from connections
-    take: (context, {
-        nodeId
-    }) => {
-        context.commit('take', nodeId);
+    take: (context, node) => {
+        context.commit('take', node);
     },
 
     // Give one to connections
-    give: (context, {
-        nodeId
-    }) => {
-        context.commit('give', nodeId);
+    give: (context, node) => {
+        context.commit('give', node);
     },
 
     // Add node to store

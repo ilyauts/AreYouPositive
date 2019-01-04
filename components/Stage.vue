@@ -3,7 +3,7 @@
     <Node
       v-for="nodeLocation in nodeLocations"
       :key="nodeLocation"
-      :location="nodeLocation"
+      :nodeId="nodeLocation.nodeId"
       :radius="nodeRadius"
     ></Node>
     <svg height="100vh" width="100vw">
@@ -14,7 +14,7 @@
         :x2="connection.x2"
         :y1="connection.y1"
         :y2="connection.y2"
-        style="stroke:#515aad;stroke-width:5"
+        class="connection"
       ></line>
     </svg>
   </div>
@@ -36,14 +36,22 @@ export default {
       nodeRadius: 5,
       numNodes: 5,
       nodeLocations: [],
-      connections: []
+      connections: [],
+
+      // Compare width to height of the screen
+      scale: 1
     };
   },
-  beforeMount() {
+  beforeMount() {},
+  beforeDestroy() {},
+  mounted() {
+    let main = document.getElementById("main");
+    // Determine x where xvh = 1vw
+    console.log(main, main.clientWidth, main.clientHeight);
+    this.scale = main.clientWidth / main.clientHeight;
+
     this.generateNodes.call(this);
   },
-  beforeDestroy() {},
-  mounted() {},
   methods: {
     ...mapActions(["addNode"]),
     generateNodes() {
@@ -116,6 +124,9 @@ export default {
       // Create connections visually
       this.createConnections(nodeArray);
 
+      // Remove any lines that intersect
+      this.removeIntersections();
+
       // Create state for nodes
       for (let obj of nodeArray) {
         this.addNode(obj);
@@ -163,15 +174,15 @@ export default {
             b = node;
           }
 
-          console.log("a", a, "b", b);
-
           // Ensure that this is the first time we're making this connection
           if (!connectionsMade.includes(arr.join("-"))) {
+
+            let scaleRadius = this.nodeRadius * this.scale;
             connectionsMade.push({
               x1: a.left + this.nodeRadius + "vw",
               x2: b.left + this.nodeRadius + "vw",
-              y1: `calc(${a.top}vh + ${this.nodeRadius}vw)`,
-              y2: `calc(${b.top}vh + ${this.nodeRadius}vw)`
+              y1: a.top + scaleRadius + "vh",
+              y2: b.top + scaleRadius + "vh"
             });
           }
         }
@@ -195,13 +206,88 @@ export default {
       length = length ? length : 10;
 
       const domain =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&";
       let nodeId = "";
       for (var i = 0; i < length; ++i) {
         nodeId += domain[this.generateInt(domain.length)];
       }
 
       return nodeId;
+    },
+    removeIntersections() {
+      let toDelete = [];
+      for (let objI1 = 0; objI1 < this.connections.length; ++objI1) {
+        // Reference to object1
+        let obj1 = this.connections[objI1];
+
+        for (let objI2 = objI1 + 1; objI2 < this.connections.length; ++objI2) {
+          // Reference to object2
+          let obj2 = this.connections[objI2];
+
+          // Delete if intersection occurs and neither are set for deleting down the road
+          if (
+            this.doesItIntersect(obj1, obj2) &&
+            !(toDelete.includes(objI1) || toDelete.includes(objI2))
+          ) {
+            // Delete the second object
+            toDelete.push(objI2);
+          }
+        }
+      }
+
+console.log('todelete', toDelete);
+      // Loop through the array and delete any old connections
+      for (let i = (this.connections.length - 1); i >= 0; --i) {
+        if (toDelete.includes(i)) {
+          this.connections.splice(i, 1);
+        }
+      }
+    },
+    doesItIntersect(obj1, obj2) {
+      console.log(
+        obj1,
+        obj2,
+        parseFloat(obj1.y1),
+        parseFloat(obj1.y2),
+        parseFloat(obj1.x1),
+        parseFloat(obj1.x2)
+      );
+      // Slopes
+      let slope1 =
+          (parseFloat(obj1.y2) - parseFloat(obj1.y1)) /
+          (parseFloat(obj1.x2) - parseFloat(obj1.x1)),
+        slope2 =
+          (parseFloat(obj2.y2) - parseFloat(obj2.y1)) /
+          (parseFloat(obj2.x2) - parseFloat(obj2.x1));
+
+      let c1 = slope1 * parseFloat(obj1.x1) - parseFloat(obj2.y1),
+        c2 = slope2 * parseFloat(obj2.x1) - parseFloat(obj2.y1);
+
+      let slopeDiff = slope1 - slope2;
+
+      // If same line, remove it
+      if (slopeDiff == 0 && c2 - c1 == 0) {
+        console.log("same line", obj1, obj2);
+        return true;
+      }
+
+      // Otherwise find x
+      let x = (c2 - c1) / (slope1 - slope2);
+
+      // Determine the x value
+      console.log(111, slope1, slope2, c1, c2, x);
+
+      // Ensure that the visible portions of both lines are the only things considered
+      if (
+        x > parseFloat(obj1.x1) &&
+        x < parseFloat(obj1.x2) &&
+        x > parseFloat(obj2.x1) &&
+        x < parseFloat(obj2.x2)
+      ) {
+        return true;
+      }
+
+      return false;
     }
   }
 };
@@ -218,5 +304,14 @@ export default {
   background-color: $dark-blue;
   left: 0;
   top: 0;
+}
+.connection {
+  stroke:$lightest-blue;
+  stroke-width:5;
+  cursor: pointer;
+
+  &:hover {
+    stroke: $lightest-orange;
+  }
 }
 </style>

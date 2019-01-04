@@ -45,7 +45,7 @@ export default {
   font-size: 0.75em;
   width: 100%;
   text-align: right;
-  color: $dark-gray;
+  color: $medium-gray;
 }
 .footer p {
   margin-right: 1vw;
