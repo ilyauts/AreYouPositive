@@ -63,13 +63,15 @@ export default {
   methods: {
     ...mapActions(["addNode", "give", "take"]),
     printLineNum(e) {
-      let slope = (e.target.dataset.y1 -
-          e.target.dataset.y2) /
-          (e.target.dataset.x1 - e.target.dataset.x2);
+      let slope =
+        (e.target.dataset.y1 - e.target.dataset.y2) /
+        (e.target.dataset.x1 - e.target.dataset.x2);
       console.log(
         `POINT X => (${e.target.dataset.x1}, ${e.target.dataset.y1}), Y=> (${
           e.target.dataset.x2
-        }, ${e.target.dataset.y2}) NAME => ${e.target.dataset.lineNum} y= ${slope}x + ${e.target.dataset.y1 - slope * e.target.dataset.x1}`
+        }, ${e.target.dataset.y2}) NAME => ${
+          e.target.dataset.lineNum
+        } y= ${slope}x + ${e.target.dataset.y1 - slope * e.target.dataset.x1}`
       );
     },
     randomizeValues() {
@@ -106,7 +108,7 @@ export default {
       // Determine the connections
       for (let objIndex in nodeArray) {
         // Always have at least one connection, assumming at least 3 nodes!!!
-        let numConnections = this.generateInt(2) + 1;
+        let numConnections = this.generateInt(nodeArray.length - 1) + 1;
 
         // Allowable connections
         let allowableConnections = Array.from(
@@ -211,7 +213,9 @@ export default {
               x1: a.left + this.nodeRadius + "vw",
               x2: b.left + this.nodeRadius + "vw",
               y1: a.top + scaleRadius + "vh",
-              y2: b.top + scaleRadius + "vh"
+              y2: b.top + scaleRadius + "vh",
+              nodeId1: a.nodeId,
+              nodeId2: b.nodeId
             });
           }
         }
@@ -249,7 +253,17 @@ export default {
         // Reference to object1
         let obj1 = this.connections[objI1];
 
+        // Ignore anything set for deletion
+        if (toDelete.includes(objI1)) {
+          continue;
+        }
+
         for (let objI2 = objI1 + 1; objI2 < this.connections.length; ++objI2) {
+          // Ignore anything set for deletion
+          if (toDelete.includes(objI2)) {
+            continue;
+          }
+
           // Reference to object2
           let obj2 = this.connections[objI2];
 
@@ -264,10 +278,14 @@ export default {
         }
       }
 
-      console.log("todelete", toDelete);
       // Loop through the array and delete any old connections
       for (let i = this.connections.length - 1; i >= 0; --i) {
         if (toDelete.includes(i)) {
+          // Remove residual references
+          // TODO: Figure this out
+          // this.nodeLocations.find(node => node.nodeId == this.connections[i].nodeId1).connections.splice(this.connections[i].nodeId2, 1);
+          // this.nodeLocations.find(node => node.nodeId == this.connections[i].nodeId2).connections.splice(this.connections[i].nodeId1, 1);
+
           this.connections.splice(i, 1);
         }
       }
@@ -277,11 +295,10 @@ export default {
         ob1x2 = parseFloat(obj1.x2),
         ob2x1 = parseFloat(obj2.x1),
         ob2x2 = parseFloat(obj2.x2),
-
-        ob1y1 = parseFloat(obj1.y1),// * this.scale,
-        ob1y2 = parseFloat(obj1.y2),// * this.scale,
-        ob2y1 = parseFloat(obj2.y1),// * this.scale,
-        ob2y2 = parseFloat(obj2.y2);// * this.scale;
+        ob1y1 = parseFloat(obj1.y1),
+        ob1y2 = parseFloat(obj1.y2),
+        ob2y1 = parseFloat(obj2.y1),
+        ob2y2 = parseFloat(obj2.y2);
 
       // Slopes
       let slope1 = (ob1y2 - ob1y1) / (ob1x2 - ob1x1),
@@ -294,7 +311,6 @@ export default {
 
       // If same line, remove it
       if (slopeDiff == 0 && c2 - c1 == 0) {
-        console.log("same line", obj1, obj2);
         return true;
       }
 
@@ -302,11 +318,9 @@ export default {
       let x = (c2 - c1) / (slope1 - slope2);
 
       // Determine the x value
-      console.log(111, `${slope1}x + ${c1}`, `${slope2}x + ${c2}`, x);
+      // console.log(111, `${slope1}x + ${c1}`, `${slope2}x + ${c2}`, x);
 
       // Ensure that the visible portions of both lines are the only things considered
-      // TODO: make this if statement work!
-      // console.log(`POINT X => (${ob1x1}, ${ob2x1}), Y=> (${ob1x2}, ${ob2x2})`);
       if (
         x > this.smallest(ob1x1, ob1x2) &&
         x < this.largest(ob1x1, ob1x2) &&
@@ -316,9 +330,28 @@ export default {
         console.log(
           `POINT X => (${ob1x1}, ${ob2x1}), Y=> (${ob1x2}, ${ob2x2}) DELETE`
         );
-        // console.log(ob1x1-ob1x2, 'delete', 232123213);
+
         return true;
-        // return false;
+      }
+
+      // Now determine if any nodes are intersected by the lines
+      for (let node of this.nodeLocations) {
+        // Start by determining the shortest distance to the center of the node
+        let xCenter = node.left + this.nodeRadius,
+          yCenter = node.top + this.nodeRadius * this.scale;
+
+        let distanceToCenter =
+          Math.abs(slope2 * xCenter + yCenter + c2) /
+          Math.sqrt(Math.pow(slope2, 2) + Math.pow(1, 2));
+
+          console.log(distanceToCenter, 'dtc', node.value, slope2);
+
+          if(distanceToCenter <= this.nodeRadius) {
+            return true;
+          }
+
+        // If the shortest distance lies within the circle, then remove the line
+        console.log("node", node);
       }
 
       return false;
