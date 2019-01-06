@@ -83,7 +83,7 @@ export default {
   box-shadow: 0 0 5px 0px rgba(0, 0, 0, 0.7);
   background-color: $orange;
   position: absolute;
-  overflow: hidden;
+  overflow: visible;
   vertical-align: middle;
 }
 .value {
@@ -121,7 +121,7 @@ export default {
 
 .minus {
   background-color: $light-orange;
-  left: 0;
+  left: -1vw;
 
   &:hover {
     background-color: $lightest-orange;
@@ -129,7 +129,7 @@ export default {
 }
 .plus {
   background-color: $light-green;
-  right: 0;
+  right: -1vw;
 
   &:hover {
     background-color: $lightest-green;

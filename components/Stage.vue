@@ -18,6 +18,8 @@
         :data-lineNum="parseFloat(connection.x2)-parseFloat(connection.x1)"
         :data-x1="parseFloat(connection.x1)"
         :data-x2="parseFloat(connection.x2)"
+        :data-y1="parseFloat(connection.y1)"
+        :data-y2="parseFloat(connection.y2)"
         v-on:click="printLineNum"
       ></line>
     </svg>
@@ -61,10 +63,13 @@ export default {
   methods: {
     ...mapActions(["addNode", "give", "take"]),
     printLineNum(e) {
+      let slope = (e.target.dataset.y1 -
+          e.target.dataset.y2) /
+          (e.target.dataset.x1 - e.target.dataset.x2);
       console.log(
-        e.target.dataset.lineNum,
-        e.target.dataset.x1,
-        e.target.dataset.x2
+        `POINT X => (${e.target.dataset.x1}, ${e.target.dataset.y1}), Y=> (${
+          e.target.dataset.x2
+        }, ${e.target.dataset.y2}) NAME => ${e.target.dataset.lineNum} y= ${slope}x + ${e.target.dataset.y1 - slope * e.target.dataset.x1}`
       );
     },
     randomizeValues() {
@@ -272,17 +277,18 @@ export default {
         ob1x2 = parseFloat(obj1.x2),
         ob2x1 = parseFloat(obj2.x1),
         ob2x2 = parseFloat(obj2.x2),
-        ob1y1 = parseFloat(obj1.y1),
-        ob1y2 = parseFloat(obj1.y2),
-        ob2y1 = parseFloat(obj2.y1),
-        ob2y2 = parseFloat(obj2.y2);
+
+        ob1y1 = parseFloat(obj1.y1),// * this.scale,
+        ob1y2 = parseFloat(obj1.y2),// * this.scale,
+        ob2y1 = parseFloat(obj2.y1),// * this.scale,
+        ob2y2 = parseFloat(obj2.y2);// * this.scale;
 
       // Slopes
       let slope1 = (ob1y2 - ob1y1) / (ob1x2 - ob1x1),
         slope2 = (ob2y2 - ob2y1) / (ob2x2 - ob2x1);
 
-      let c1 = (slope1 * ob1x1 - ob2y1) * -1,
-        c2 = (slope2 * ob2x1 - ob2y1) * -1;
+      let c1 = ob1y1 - slope1 * ob1x1,
+        c2 = ob2y1 - slope2 * ob2x1;
 
       let slopeDiff = slope1 - slope2;
 
@@ -296,20 +302,23 @@ export default {
       let x = (c2 - c1) / (slope1 - slope2);
 
       // Determine the x value
-      // console.log(111, slope1, slope2, c1, c2, x);
+      console.log(111, `${slope1}x + ${c1}`, `${slope2}x + ${c2}`, x);
 
       // Ensure that the visible portions of both lines are the only things considered
       // TODO: make this if statement work!
-      console.log(ob1x1 - ob1x2, ob1x1, ob2x1, ob1x2, ob2x2);
+      // console.log(`POINT X => (${ob1x1}, ${ob2x1}), Y=> (${ob1x2}, ${ob2x2})`);
       if (
         x > this.smallest(ob1x1, ob1x2) &&
         x < this.largest(ob1x1, ob1x2) &&
         x > this.smallest(ob2x1, ob2x2) &&
         x < this.largest(ob2x1, ob2x2)
       ) {
+        console.log(
+          `POINT X => (${ob1x1}, ${ob2x1}), Y=> (${ob1x2}, ${ob2x2}) DELETE`
+        );
         // console.log(ob1x1-ob1x2, 'delete', 232123213);
-        // return true;
-        return false;
+        return true;
+        // return false;
       }
 
       return false;
