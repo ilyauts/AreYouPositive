@@ -23,6 +23,15 @@
         v-on:click="printLineNum"
       ></line>
     </svg>
+    <img
+      v-for="(money, index) in moneys"
+      :key="money"
+      class="money"
+      :id="'moneys-'+ index"
+      :style="{ top: money.currTop + 'vh', left: money.currLeft + 'vw'}"
+      src="money-wallet.svg"
+      alt="Money"
+    >
   </div>
 </template>
 
@@ -43,6 +52,7 @@ export default {
       numNodes: 5,
       nodeLocations: [],
       connections: [],
+      moneys: [],
 
       // Compare width to height of the screen
       scale: 1
@@ -461,6 +471,63 @@ export default {
 
       return false;
     },
+    animateMoney() {
+      if (this.lastAction !== "give" && this.lastAction !== "take") {
+        return;
+      }
+
+      // Nuke any old moneys
+      this.moneys = [];
+
+      let node = this.nodeLocations.find(
+        nodeElement => nodeElement.nodeId === this.lastActionNode
+      );
+
+      for (let endNodeId of node.connections) {
+        let endNode = this.nodeLocations.find(
+          nodeElement => nodeElement.nodeId === endNodeId
+        );
+
+        let startingAtParent = this.lastAction === "give";
+
+        // Determine from where and to where
+        let deltaRadius = this.nodeRadius - 1.5; // radius minus 1/2 radius of money
+
+        let startingLeft = startingAtParent
+            ? node.left + deltaRadius
+            : endNode.left + deltaRadius,
+          endingLeft = startingAtParent
+            ? endNode.left + deltaRadius
+            : node.left + deltaRadius,
+          startingTop = startingAtParent
+            ? node.top + deltaRadius * this.scale
+            : endNode.top + deltaRadius * this.scale,
+          endingTop = startingAtParent
+            ? endNode.top + deltaRadius * this.scale
+            : node.top + deltaRadius * this.scale;
+
+        // Add to moneys
+        this.moneys.push({
+          startingLeft,
+          endingLeft,
+          startingTop,
+          endingTop,
+          currLeft: startingLeft,
+          currTop: startingTop
+        });
+      }
+
+      // Wait a bit and then change the top and left
+      setTimeout(() => {
+      // Now loop through all of the moneys and change the positions
+        for (let money of this.moneys) {
+          money.currLeft = money.endingLeft;
+          money.currTop = money.endingTop;
+        }
+      }, 25);
+
+      console.log(this.lastAction, this.lastActionNode);
+    },
     smallest(a, b) {
       return a > b ? b : a;
     },
@@ -471,7 +538,9 @@ export default {
   computed: {
     ...mapGetters({
       getNodes: "getNodes",
-      movesLeft: "getActionsLeft"
+      movesLeft: "getActionsLeft",
+      lastAction: "lastAction",
+      lastActionNode: "lastActionNode"
     })
   },
   watch: {
@@ -486,6 +555,9 @@ export default {
         else if (newNum === 0) {
           this.showLoss();
         }
+
+        // Handle animation
+        this.animateMoney();
       }
     }
   }
@@ -512,5 +584,11 @@ export default {
   &:hover {
     stroke: $lightest-orange;
   }
+}
+.money {
+  transition: 0.5s all linear;
+  z-index: 11;
+  position: absolute;
+  width: 3vw;
 }
 </style>

@@ -11,7 +11,7 @@ server.use(bodyParser.urlencoded({ // to support URL-encoded bodies
 server.use(express.static('public'));
 server.use(express.static('js'));
 server.use(express.static('components'));
-server.use(express.static(__dirname + '../public'));
+// server.use(express.static(__dirname + '../public'));
 server.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "*");

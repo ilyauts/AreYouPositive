@@ -25,7 +25,7 @@ export default {
   beforeMount() {},
   beforeDestroy() {},
   mounted() {
-    TweenLite.to(this.$data, 0.5, { tweenedValue: this.node.value });
+    TweenLite.to(this.$data, 1, { tweenedValue: this.node.value });
   },
   methods: {
     ...mapActions(["give", "take"]),
@@ -86,6 +86,7 @@ export default {
   position: absolute;
   overflow: visible;
   vertical-align: middle;
+  z-index: 12;
 }
 .value {
   text-align: center;

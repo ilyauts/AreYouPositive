@@ -3,7 +3,10 @@ const defaultState = {
     actionsTaken: 0,
     actionsLeft: 0,
     showLoss: false,
-    showWin: false
+    showWin: false,
+
+    lastAction: null,
+    lastActionNode: null
 };
 
 const getters = {
@@ -12,7 +15,8 @@ const getters = {
     getActionsLeft: (state) => state.actionsLeft,
     showLoss: (state) => state.showLoss,
     showWin: (state) => state.showWin,
-
+    lastAction: (state) => state.lastAction,
+    lastActionNode: (state) => state.lastActionNode,
 };
 
 const mutations = {
@@ -39,6 +43,8 @@ const mutations = {
 
         // Update state
         state.nodes = nodesCopy;
+        state.lastAction = 'take';
+        state.lastActionNode = nodeId;
         state.actionsLeft--;
     },
 
@@ -65,6 +71,8 @@ const mutations = {
 
         // Update state
         state.nodes = nodesCopy;
+        state.lastAction = 'give';
+        state.lastActionNode = nodeId;
         state.actionsLeft--;
     },
 

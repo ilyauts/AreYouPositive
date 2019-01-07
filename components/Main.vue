@@ -131,7 +131,7 @@ ul {
   height: 100vh;
   width: 100vw;
   background-color: rgba(0, 0, 0, 0.88);
-  z-index: 12;
+  z-index: 20;
 }
 .full-message h1 {
   color: $green;
