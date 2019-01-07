@@ -56,12 +56,17 @@ export default {
     // Determine x where xvh = 1vw
     this.scale = main.clientWidth / main.clientHeight;
 
-    this.generateNodes.call(this);
+    // Repeat while loners exist or we've tried for long enough
+    let generationCount = 0;
+
+    do {
+      this.generateNodes.call(this);
+    } while(this.anyLoners() && generationCount < 100);
 
     this.randomizeValues();
   },
   methods: {
-    ...mapActions(["addNode", "give", "take"]),
+    ...mapActions(["addNode", "give", "take", "numActionsTaken", "showLoss", "showWin", "nukeNodes"]),
     printLineNum(e) {
       let slope =
         (e.target.dataset.y1 - e.target.dataset.y2) /
@@ -76,28 +81,52 @@ export default {
     },
     randomizeValues() {
       // Loop through all nodes and randomly act
-      let numActions = this.generateInt(1000);
+      do {
+        let numActions = this.generateInt(1000) + 5; // At least 5 actions at all times
 
-      return;
+        for (let i = 0; i < numActions; ++i) {
+          if (this.generateInt(2)) {
+            this.give(this.nodeLocations[this.generateInt(this.numNodes)]);
+          } else {
+            this.take(this.nodeLocations[this.generateInt(this.numNodes)]);
+          }
+        }
 
-      for (let i = 0; i < numActions; ++i) {
-        if (this.generateInt(2)) {
-          this.give(this.nodeLocations[this.generateInt(this.numNodes)]);
-        } else {
-          this.take(this.nodeLocations[this.generateInt(this.numNodes)]);
+        // Store the number of actions taken
+        this.numActionsTaken(numActions);
+      } while (this.allPositive());
+    },
+    allPositive() {
+      // Ensure that at least one node is negative
+      for (let node of this.nodeLocations) {
+        if (node.value <= 0) {
+          return false;
         }
       }
+      return true;
+    },
+    // Ensure that all nodes are connected
+    anyLoners() {
+      for(let node of this.nodeLocations) {
+        if(node.connections.length === 0) {
+          return true;
+        }
+      } 
+
+      return false;
     },
     generateNodes() {
+      // Start by nuking the nodes in store
+      this.nukeNodes();
+
       let attempts = 0,
         nodeArray = [];
 
       do {
-        // console.log(1111);
         let obj = {
           top: this.generateNum(46),
           left: this.generateNum(91),
-          value: this.generateInt(100),
+          value: this.generateInt(10) + 1,
           nodeId: this.generateNodeId(),
           connections: []
         };
@@ -230,7 +259,6 @@ export default {
       // Update state
       this.connections = connectionsMade;
     },
-    drawConnections() {},
     generateNum(max) {
       max = max ? max : 100;
 
@@ -400,8 +428,25 @@ export default {
   },
   computed: {
     ...mapGetters({
-      getNodes: "getNodes"
+      getNodes: "getNodes",
+      movesLeft: "getActionsLeft"
     })
+  },
+  watch: {
+    movesLeft: {
+      handler(newNum) {
+        // Check if you won
+        if(this.allPositive()) {
+          console.log('yay');
+          this.showWin();
+        } 
+
+        // Did you lose?
+        else if (newNum === 0) {
+          this.showLoss();
+        }
+      }
+    }
   }
 };
 </script>

@@ -1,9 +1,18 @@
 const defaultState = {
-    nodes: {}
+    nodes: {},
+    actionsTaken: 0,
+    actionsLeft: 0,
+    showLoss: false,
+    showWin: false
 };
 
 const getters = {
-    getNodes: (state) => state.nodes
+    getNodes: (state) => state.nodes,
+    getActionsTaken: (state) => state.actionsTaken,
+    getActionsLeft: (state) => state.actionsLeft,
+    showLoss: (state) => state.showLoss,
+    showWin: (state) => state.showWin,
+
 };
 
 const mutations = {
@@ -12,8 +21,8 @@ const mutations = {
     }) {
 
         let nodesCopy = {
-                ...state.nodes
-            },
+            ...state.nodes
+        },
             myNode = nodesCopy[nodeId];
 
         // Ensure it exists
@@ -30,6 +39,7 @@ const mutations = {
 
         // Update state
         state.nodes = nodesCopy;
+        state.actionsLeft--;
     },
 
     give(state, {
@@ -37,8 +47,8 @@ const mutations = {
     }) {
 
         let nodesCopy = {
-                ...state.nodes
-            },
+            ...state.nodes
+        },
             myNode = nodesCopy[nodeId];
 
         // Ensure it exists
@@ -55,6 +65,7 @@ const mutations = {
 
         // Update state
         state.nodes = nodesCopy;
+        state.actionsLeft--;
     },
 
     addNode(state, node) {
@@ -68,6 +79,24 @@ const mutations = {
 
         // Update state
         state.nodes = nodesCopy;
+    },
+
+    numActionsTaken(state, actions) {
+        // Assumption that a random walk would be 2x less efficient than a player
+        state.actionsTaken = actions;
+        state.actionsLeft = Math.floor(actions / 2);
+    },
+
+    showLoss(state) {
+        state.showLoss = true;
+    },
+
+    showWin(state) {
+        state.showWin = true;
+    },
+
+    nukeNodes(state) {
+        state = defaultState;
     }
 };
 
@@ -85,6 +114,22 @@ const actions = {
     // Add node to store
     addNode: (context, node) => {
         context.commit('addNode', node);
+    },
+
+    numActionsTaken: (context, actions) => {
+        context.commit('numActionsTaken', actions);
+    },
+
+    showLoss: (context) => {
+        context.commit('showLoss');
+    },
+
+    showWin: (context) => {
+        context.commit('showWin');
+    },
+
+    nukeNodes: (context) => {
+        context.commit('nukeNodes');
     }
 };
 

@@ -39,7 +39,7 @@ module.exports = {
         use: 'url-loader',
       },
       {
-        test: /\.(ttf|eot|svg|jpg|png|jpeg|mp4)(\?[\s\S]+)?$/,
+        test: /\.(ttf|eot|svg|otf|jpg|png|jpeg|mp4)(\?[\s\S]+)?$/,
         loader: 'file-loader',
         options: {
           publicPath: 'public/'
