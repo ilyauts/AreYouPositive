@@ -377,10 +377,12 @@ export default {
         ob1x2 = parseFloat(obj1.x2),
         ob2x1 = parseFloat(obj2.x1),
         ob2x2 = parseFloat(obj2.x2),
-        ob1y1 = parseFloat(obj1.y1),
-        ob1y2 = parseFloat(obj1.y2),
-        ob2y1 = parseFloat(obj2.y1),
-        ob2y2 = parseFloat(obj2.y2);
+
+        // Map y scale to x scale
+        ob1y1 = parseFloat(obj1.y1) * this.scale,
+        ob1y2 = parseFloat(obj1.y2) * this.scale,
+        ob2y1 = parseFloat(obj2.y1) * this.scale,
+        ob2y2 = parseFloat(obj2.y2) * this.scale;
 
       // Slopes
       let slope1 = (ob1y2 - ob1y1) / (ob1x2 - ob1x1),
@@ -415,11 +417,13 @@ export default {
         if (node.nodeId !== obj2.nodeId1 && node.nodeId !== obj2.nodeId2) {
           // Start by determining the shortest distance to the center of the node
           let xCenter = node.left + this.nodeRadius,
-            yCenter = node.top + this.nodeRadius * this.scale;
+            yCenter = node.top + this.nodeRadius;
 
           let distanceToCenter =
             Math.abs(slope2 * xCenter + -1 * yCenter + c2) /
             Math.sqrt(Math.pow(slope2, 2) + Math.pow(-1, 2));
+
+            // console.log('distanceToCenter', distanceToCenter, 'xs', ob1x1, ob2x1, 'nodeId', node.nodeId, 'radius', this.nodeRadius)
 
           // console.log(
           //   distanceToCenter,

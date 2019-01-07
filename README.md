@@ -18,4 +18,4 @@ And navigate to http://localhost:7288
 
 Check out the demo here:
 
-[www.AreYouPostiive.fun](http://www.AreYouPositive.fun)
+[www.AreYouPositive.fun](http://www.AreYouPositive.fun)

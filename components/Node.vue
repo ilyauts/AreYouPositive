@@ -3,6 +3,7 @@
     <div class="value" :data-id="nodeId">
       <div class="minus" v-on:click="giveWrapper">-</div>
       <span>{{integerValue}}</span>
+      <!-- <span>{{nodeId}}</span> -->
       <div class="plus" v-on:click="takeWrapper">+</div>
     </div>
   </div>
@@ -102,7 +103,7 @@ export default {
   cursor: pointer;
   top: calc(50% - 1vw);
   color: white;
-  line-height: 122%;
+  line-height: 2vw;
   font-size: 1.5vw;
 }
 
@@ -138,5 +139,7 @@ export default {
 
 .value span {
   transition: 500ms linear all;
+
+  font-size: 3vh;
 }
 </style>
