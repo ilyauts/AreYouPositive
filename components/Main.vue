@@ -9,7 +9,8 @@
       <button class="message-action" @click="reload">Play again?</button>
     </div>
     <Stage></Stage>
-    <h2 class="moves-left">Moves Left: {{movesLeft}}</h2>
+    <h2 class="objective">Make every node positive!</h2>
+    <h2 class="moves-left">Moves Left: <span>{{movesLeft}}</span></h2>
     <div class="footer">
       <p>
         Copyright &copy; 2019
@@ -113,9 +114,17 @@ ul {
   text-decoration: none;
 }
 .moves-left {
-  margin-top: 82vh;
   margin-left: 1vw;
   color: $orange;
+
+  & span {
+    text-decoration: underline;
+  }
+}
+.objective {
+  margin-top: 82vh;
+  margin-left: 1vw;
+  color: $darkest-orange;
 }
 .full-message {
   position: absolute;
