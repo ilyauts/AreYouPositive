@@ -144,7 +144,7 @@ export default {
       do {
         let obj = {
           top: this.generateNum(46),
-          left: this.generateNum(91),
+          left: this.generateNum(89) + 1,
           value: this.generateInt(10) + 1,
           nodeId: this.generateNodeId(),
           connections: []
