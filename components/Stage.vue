@@ -105,9 +105,9 @@ export default {
 
         for (let i = 0; i < numActions; ++i) {
           if (this.generateInt(2)) {
-            this.give(this.nodeLocations[this.generateInt(this.numNodes)]);
+            this.give(this.nodeLocations[this.generateInt(this.nodeLocations.length)]);
           } else {
-            this.take(this.nodeLocations[this.generateInt(this.numNodes)]);
+            this.take(this.nodeLocations[this.generateInt(this.nodeLocations.length)]);
           }
         }
 
