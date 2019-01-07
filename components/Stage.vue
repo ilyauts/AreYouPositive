@@ -62,7 +62,7 @@ export default {
       this.generateNodes.call(this);
 
       generationCount++;
-    } while (this.anyLoners() && generationCount < 100);
+    } while (!this.noLoners() && generationCount < 100);
 
     // Randomize node values
     this.randomizeValues();
@@ -105,9 +105,13 @@ export default {
 
         for (let i = 0; i < numActions; ++i) {
           if (this.generateInt(2)) {
-            this.give(this.nodeLocations[this.generateInt(this.nodeLocations.length)]);
+            this.give(
+              this.nodeLocations[this.generateInt(this.nodeLocations.length)]
+            );
           } else {
-            this.take(this.nodeLocations[this.generateInt(this.nodeLocations.length)]);
+            this.take(
+              this.nodeLocations[this.generateInt(this.nodeLocations.length)]
+            );
           }
         }
 
@@ -125,14 +129,27 @@ export default {
       return true;
     },
     // Ensure that all nodes are connected
-    anyLoners() {
-      for (let node of this.nodeLocations) {
-        if (node.connections.length === 0) {
-          return true;
-        }
+    noLoners() {
+      let nodesTraversed = [];
+      this.recursiveNodeSearch(this.nodeLocations[0].nodeId, nodesTraversed);
+
+      return nodesTraversed.length === this.nodeLocations.length;
+    },
+    recursiveNodeSearch(nodeId, foundArr) {
+      // If we've already seen this node return
+      if (foundArr.includes(nodeId)) {
+        return foundArr;
       }
 
-      return false;
+      // Note that this node has been traversed
+      foundArr.push(nodeId);
+
+      let currNode = this.nodeLocations.find(node => node.nodeId === nodeId);
+      for (let connection of currNode.connections) {
+        foundArr = this.recursiveNodeSearch(connection, foundArr);
+      }
+
+      return foundArr;
     },
     generateNodes() {
       // Start by nuking the nodes in store
@@ -377,7 +394,6 @@ export default {
         ob1x2 = parseFloat(obj1.x2),
         ob2x1 = parseFloat(obj2.x1),
         ob2x2 = parseFloat(obj2.x2),
-
         // Map y scale to x scale
         ob1y1 = parseFloat(obj1.y1) * this.scale,
         ob1y2 = parseFloat(obj1.y2) * this.scale,
@@ -423,7 +439,7 @@ export default {
             Math.abs(slope2 * xCenter + -1 * yCenter + c2) /
             Math.sqrt(Math.pow(slope2, 2) + Math.pow(-1, 2));
 
-            // console.log('distanceToCenter', distanceToCenter, 'xs', ob1x1, ob2x1, 'nodeId', node.nodeId, 'radius', this.nodeRadius)
+          // console.log('distanceToCenter', distanceToCenter, 'xs', ob1x1, ob2x1, 'nodeId', node.nodeId, 'radius', this.nodeRadius)
 
           // console.log(
           //   distanceToCenter,
