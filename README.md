@@ -13,3 +13,9 @@ Math game - try to get each node to be positive
     npm start
 
 And navigate to http://localhost:7288
+
+## Demo
+
+Check out the demo here:
+
+[www.AreYouPostiive.fun](www.AreYouPositive.com)

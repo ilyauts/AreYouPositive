@@ -6,7 +6,7 @@
       :nodeId="nodeLocation.nodeId"
       :radius="nodeRadius"
     ></Node>
-    <svg height="100vh" width="100vw">
+    <svg height="100vh" width="100vw" id="svg-lines">
       <line
         v-for="connection in connections"
         :key="connection"
@@ -58,19 +58,38 @@ export default {
 
     // Repeat while loners exist or we've tried for long enough
     let generationCount = 0;
-
     do {
       this.generateNodes.call(this);
-    } while(this.anyLoners() && generationCount < 100);
 
+      generationCount++;
+    } while (this.anyLoners() && generationCount < 100);
+
+    // Randomize node values
     this.randomizeValues();
+
+    // Redraw svg on window resize
+    window.addEventListener("resize", () => {
+      document.getElementById("svg-lines").style.display = "hidden";
+      window.requestAnimationFrame(() => {
+        document.getElementById("svg-lines").style.display = "inline";
+      });
+    });
   },
   methods: {
-    ...mapActions(["addNode", "give", "take", "numActionsTaken", "showLoss", "showWin", "nukeNodes"]),
+    ...mapActions([
+      "addNode",
+      "give",
+      "take",
+      "numActionsTaken",
+      "showLoss",
+      "showWin",
+      "nukeNodes"
+    ]),
     printLineNum(e) {
       let slope =
         (e.target.dataset.y1 - e.target.dataset.y2) /
         (e.target.dataset.x1 - e.target.dataset.x2);
+
       console.log(
         `POINT X => (${e.target.dataset.x1}, ${e.target.dataset.y1}), Y=> (${
           e.target.dataset.x2
@@ -107,11 +126,11 @@ export default {
     },
     // Ensure that all nodes are connected
     anyLoners() {
-      for(let node of this.nodeLocations) {
-        if(node.connections.length === 0) {
+      for (let node of this.nodeLocations) {
+        if (node.connections.length === 0) {
           return true;
         }
-      } 
+      }
 
       return false;
     },
@@ -380,9 +399,6 @@ export default {
       // Otherwise find x
       let x = (c2 - c1) / (slope1 - slope2);
 
-      // Determine the x value
-      // console.log(111, `${slope1}x + ${c1}`, `${slope2}x + ${c2}`, x);
-
       // Ensure that the visible portions of both lines are the only things considered
       if (
         x > this.smallest(ob1x1, ob1x2) &&
@@ -390,31 +406,37 @@ export default {
         x > this.smallest(ob2x1, ob2x2) &&
         x < this.largest(ob2x1, ob2x2)
       ) {
-        console.log(
-          `POINT X => (${ob1x1}, ${ob2x1}), Y=> (${ob1x2}, ${ob2x2}) DELETE`
-        );
-
         return true;
       }
 
       // Now determine if any nodes are intersected by the lines
       for (let node of this.nodeLocations) {
-        // Start by determining the shortest distance to the center of the node
-        let xCenter = node.left + this.nodeRadius,
-          yCenter = node.top + this.nodeRadius * this.scale;
+        // Ignore if one of the two connecting nodes
+        if (node.nodeId !== obj2.nodeId1 && node.nodeId !== obj2.nodeId2) {
+          // Start by determining the shortest distance to the center of the node
+          let xCenter = node.left + this.nodeRadius,
+            yCenter = node.top + this.nodeRadius * this.scale;
 
-        let distanceToCenter =
-          Math.abs(slope2 * xCenter + yCenter + c2) /
-          Math.sqrt(Math.pow(slope2, 2) + Math.pow(1, 2));
+          let distanceToCenter =
+            Math.abs(slope2 * xCenter + -1 * yCenter + c2) /
+            Math.sqrt(Math.pow(slope2, 2) + Math.pow(-1, 2));
 
-        console.log(distanceToCenter, "dtc", node.value, slope2);
+          // console.log(
+          //   distanceToCenter,
+          //   "dtc",
+          //   node.value,
+          //   slope2,
+          //   this.nodeRadius,
+          //   obj1,
+          //   obj2
+          // );
 
-        if (distanceToCenter <= this.nodeRadius) {
-          return true;
+          // If the shortest distance lies within the circle, then remove the line
+          // TODO: The *2 is a fudge factor because we're using a different x and y scale, need to make both scales the same
+          if (distanceToCenter <= this.nodeRadius * 2) {
+            return true;
+          }
         }
-
-        // If the shortest distance lies within the circle, then remove the line
-        console.log("node", node);
       }
 
       return false;
@@ -436,10 +458,9 @@ export default {
     movesLeft: {
       handler(newNum) {
         // Check if you won
-        if(this.allPositive()) {
-          console.log('yay');
+        if (this.allPositive()) {
           this.showWin();
-        } 
+        }
 
         // Did you lose?
         else if (newNum === 0) {
