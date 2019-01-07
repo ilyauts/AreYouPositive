@@ -82,9 +82,9 @@ const mutations = {
     },
 
     numActionsTaken(state, actions) {
-        // Assumption that a random walk would be 2x less efficient than a player
+        // Assumption that a random walk would be 5x less efficient than a player
         state.actionsTaken = actions;
-        state.actionsLeft = Math.floor(actions / 2);
+        state.actionsLeft = Math.floor(actions / 5);
     },
 
     showLoss(state) {
