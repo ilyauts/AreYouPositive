@@ -78,6 +78,8 @@ export default {
       // Loop through all nodes and randomly act
       let numActions = this.generateInt(1000);
 
+      return;
+
       for (let i = 0; i < numActions; ++i) {
         if (this.generateInt(2)) {
           this.give(this.nodeLocations[this.generateInt(this.numNodes)]);
@@ -95,7 +97,7 @@ export default {
         let obj = {
           top: this.generateNum(46),
           left: this.generateNum(91),
-          value: this.generateInt(10),
+          value: this.generateInt(100),
           nodeId: this.generateNodeId(),
           connections: []
         };
@@ -107,7 +109,7 @@ export default {
 
       // Determine the connections
       for (let objIndex in nodeArray) {
-        // Always have at least one connection, assumming at least 3 nodes!!!
+        // Always have at least one connection
         let numConnections = this.generateInt(nodeArray.length - 1) + 1;
 
         // Allowable connections
@@ -154,7 +156,7 @@ export default {
       this.nodeLocations = nodeArray;
 
       // Create connections visually
-      this.createConnections(nodeArray);
+      this.createConnections();
 
       // Remove any lines that intersect
       this.removeIntersections();
@@ -207,7 +209,11 @@ export default {
           }
 
           // Ensure that this is the first time we're making this connection
-          if (!connectionsMade.includes(arr.join("-"))) {
+          if (
+            !connectionsMade.find(
+              cEl => cEl.nodeId1 === arr[0] && cEl.nodeId2 === arr[1]
+            )
+          ) {
             let scaleRadius = this.nodeRadius * this.scale;
             connectionsMade.push({
               x1: a.left + this.nodeRadius + "vw",
@@ -278,13 +284,42 @@ export default {
         }
       }
 
+      // Sort delete array
+      toDelete.sort((a, b) => a - b);
+
       // Loop through the array and delete any old connections
       for (let i = this.connections.length - 1; i >= 0; --i) {
+        // Only delete those connections that are slated for deletion
+        let currConnection = this.connections[i];
+
         if (toDelete.includes(i)) {
           // Remove residual references
-          // TODO: Figure this out
-          // this.nodeLocations.find(node => node.nodeId == this.connections[i].nodeId1).connections.splice(this.connections[i].nodeId2, 1);
-          // this.nodeLocations.find(node => node.nodeId == this.connections[i].nodeId2).connections.splice(this.connections[i].nodeId1, 1);
+          let node1 = this.nodeLocations.find(
+            node => node.nodeId === currConnection.nodeId1
+          );
+          let node2 = this.nodeLocations.find(
+            node => node.nodeId === currConnection.nodeId2
+          );
+
+          // Determine if linkage still exists
+          let indexOfConnection1 = node1.connections.indexOf(
+            currConnection.nodeId2
+          );
+
+          // If so, unlink it
+          if (indexOfConnection1 >= 0) {
+            node1.connections.splice(indexOfConnection1, 1);
+          }
+
+          // Determine if linkage still exists in reverse
+          let indexOfConnection2 = node2.connections.indexOf(
+            currConnection.nodeId1
+          );
+
+          // If so, unlink it
+          if (indexOfConnection2 >= 0) {
+            node2.connections.splice(indexOfConnection2, 1);
+          }
 
           this.connections.splice(i, 1);
         }
@@ -344,11 +379,11 @@ export default {
           Math.abs(slope2 * xCenter + yCenter + c2) /
           Math.sqrt(Math.pow(slope2, 2) + Math.pow(1, 2));
 
-          console.log(distanceToCenter, 'dtc', node.value, slope2);
+        console.log(distanceToCenter, "dtc", node.value, slope2);
 
-          if(distanceToCenter <= this.nodeRadius) {
-            return true;
-          }
+        if (distanceToCenter <= this.nodeRadius) {
+          return true;
+        }
 
         // If the shortest distance lies within the circle, then remove the line
         console.log("node", node);
