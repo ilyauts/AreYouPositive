@@ -136,6 +136,11 @@ ul {
   bottom: 0vh;
   font-size: 0.75em;
   width: 100%;
+  height: 5vh;
+  padding-bottom: 1vh;
+  background-color: black;
+  font-size: 1vw;
+  right: 0;
   text-align: right;
   color: $medium-gray;
   margin-top: auto;
@@ -150,8 +155,9 @@ ul {
                                   supported by Chrome and Opera */
 }
 .footer p {
-  margin-right: 1vw;
-  margin-bottom: 1vh;
+  position: absolute;
+  bottom: 1vh;
+  right: 1vw;
 }
 .footer p a {
   color: $orange;
@@ -243,8 +249,12 @@ ul {
   margin-left: 0;
 }
 #below-stage {
-  margin-top: 82vh;
+  position: fixed;
+  bottom: 5vh;
   width: 100%;
   height: 18vh;
+}
+h2 {
+  font-size: 1.5vw;
 }
 </style>

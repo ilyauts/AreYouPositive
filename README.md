@@ -1,7 +1,7 @@
 ![Avatar](public/Logo.png)
 
 # AreYouPositive
-Math game - try to get each node to be positive
+Math game - try to get each node to be positive. Based on: [https://www.youtube.com/watch?v=U33dsEcKgeQ](https://www.youtube.com/watch?v=U33dsEcKgeQ) with the slight variation that all nodes must be at least positive and not at least 0.
 
 ## Installation
 

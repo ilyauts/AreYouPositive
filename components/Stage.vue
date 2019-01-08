@@ -7,7 +7,7 @@
       :radius="nodeRadius"
     ></Node>
     <svg
-      height="80vh"
+      height="77vh"
       width="100vw"
       id="svg-lines"
       xmlns="http://www.w3.org/2000/svg"
@@ -179,7 +179,7 @@ export default {
 
       do {
         let obj = {
-          top: this.generateNum(46),
+          top: this.generateNum(67),
           left: this.generateNum(89) + 1,
           value: this.generateInt(10) + 1,
           nodeId: this.generateNodeId(),
@@ -576,7 +576,7 @@ export default {
 // Import colors and such
 @import "../scss/variables";
 #stage {
-  height: 80vh;
+  height: 77vh;
   width: 100vw;
   overflow: hidden;
   position: absolute;
