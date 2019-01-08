@@ -6,7 +6,7 @@
       :nodeId="nodeLocation.nodeId"
       :radius="nodeRadius"
     ></Node>
-    <svg height="100vh" width="100vw" id="svg-lines">
+    <svg height="80vh" width="100vw" id="svg-lines">
       <line
         v-for="connection in connections"
         :key="connection"
@@ -81,12 +81,13 @@ export default {
     this.randomizeValues();
 
     // Redraw svg on window resize
-    window.addEventListener("resize", () => {
-      document.getElementById("svg-lines").style.display = "hidden";
-      window.requestAnimationFrame(() => {
-        document.getElementById("svg-lines").style.display = "inline";
-      });
-    });
+    // window.addEventListener("resize", () => {
+    //   this.connections = [...this.connections];
+    //   // document.getElementById("svg-lines").style.display = "none";
+    //   // window.requestAnimationFrame(() => {
+    //   //   document.getElementById("svg-lines").style.display = "inline";
+    //   // });
+    // });
   },
   methods: {
     ...mapActions([
@@ -408,10 +409,10 @@ export default {
         ob2x1 = parseFloat(obj2.x1),
         ob2x2 = parseFloat(obj2.x2),
         // Map y scale to x scale
-        ob1y1 = parseFloat(obj1.y1) * this.scale,
-        ob1y2 = parseFloat(obj1.y2) * this.scale,
-        ob2y1 = parseFloat(obj2.y1) * this.scale,
-        ob2y2 = parseFloat(obj2.y2) * this.scale;
+        ob1y1 = parseFloat(obj1.y1) / this.scale,
+        ob1y2 = parseFloat(obj1.y2) / this.scale,
+        ob2y1 = parseFloat(obj2.y1) / this.scale,
+        ob2y2 = parseFloat(obj2.y2) / this.scale;
 
       // Slopes
       let slope1 = (ob1y2 - ob1y1) / (ob1x2 - ob1x1),
@@ -446,27 +447,15 @@ export default {
         if (node.nodeId !== obj2.nodeId1 && node.nodeId !== obj2.nodeId2) {
           // Start by determining the shortest distance to the center of the node
           let xCenter = node.left + this.nodeRadius,
-            yCenter = node.top + this.nodeRadius;
+            yCenter = node.top / this.scale + this.nodeRadius;
 
           let distanceToCenter =
             Math.abs(slope2 * xCenter + -1 * yCenter + c2) /
             Math.sqrt(Math.pow(slope2, 2) + Math.pow(-1, 2));
 
-          // console.log('distanceToCenter', distanceToCenter, 'xs', ob1x1, ob2x1, 'nodeId', node.nodeId, 'radius', this.nodeRadius)
-
-          // console.log(
-          //   distanceToCenter,
-          //   "dtc",
-          //   node.value,
-          //   slope2,
-          //   this.nodeRadius,
-          //   obj1,
-          //   obj2
-          // );
-
           // If the shortest distance lies within the circle, then remove the line
-          // TODO: The *2 is a fudge factor because we're using a different x and y scale, need to make both scales the same
-          if (distanceToCenter <= this.nodeRadius * 2) {
+          // 1.5 is a fudge factor
+          if (distanceToCenter <= this.nodeRadius * 1.5) {
             return true;
           }
         }
@@ -528,8 +517,6 @@ export default {
           money.currTop = money.endingTop;
         }
       }, 25);
-
-      console.log(this.lastAction, this.lastActionNode);
     },
     smallest(a, b) {
       return a > b ? b : a;

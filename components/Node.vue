@@ -3,7 +3,7 @@
     <div class="value" :data-id="nodeId">
       <div class="minus" v-on:click="giveWrapper">-</div>
       <span>{{integerValue}}</span>
-      <!-- <span>{{nodeId}}</span> -->
+      <span>{{nodeId}}</span>
       <div class="plus" v-on:click="takeWrapper">+</div>
     </div>
   </div>
