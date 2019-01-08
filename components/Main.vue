@@ -9,8 +9,26 @@
       <button class="message-action" @click="reload">Play again?</button>
     </div>
     <Stage></Stage>
-    <h2 class="objective">Make every node positive!</h2>
-    <h2 class="moves-left">Moves Left: <span>{{movesLeft}}</span></h2>
+    <div id="below-stage">
+      <div id="left-half">
+        <h2 class="objective">Make every node positive!</h2>
+        <h2 class="moves-left">
+          Moves Left:
+          <span>{{movesLeft}}</span>
+        </h2>
+      </div>
+      <div id="right-half">
+        <h2 class="objective">Select level:</h2>
+        <button
+          v-for="level of levelOptions"
+          :key="level"
+          :class="{level: true, chosen: getLevel === level.level}"
+          :data-level="level.level"
+          @click="changeLevelWrapper"
+        >{{level.name}}</button>
+      </div>
+    </div>
+
     <div class="footer">
       <p>
         Copyright &copy; 2019
@@ -32,13 +50,34 @@ export default {
     Stage
   },
   data() {
-    return {};
+    return {
+      levelOptions: [
+        {
+          level: "easy",
+          name: "Easy",
+          numNodes: 4
+        },
+        {
+          level: "medium",
+          name: "Medium",
+          numNodes: 6
+        },
+        {
+          level: "hard",
+          name: "Hard",
+          numNodes: 10
+        }
+      ]
+    };
   },
   beforeMount() {},
   beforeDestroy() {},
-  mounted() {
-  },
+  mounted() {},
   methods: {
+    ...mapActions(["changeLevel"]),
+    changeLevelWrapper(e) {
+      this.changeLevel(e.target.dataset.level);
+    },
     reload() {
       location.reload(true);
     }
@@ -48,7 +87,8 @@ export default {
       movesLeft: "getActionsLeft",
       movesTaken: "getActionsTaken",
       showLoss: "showLoss",
-      showWin: "showWin"
+      showWin: "showWin",
+      getLevel: "getLevel"
     })
   }
 };
@@ -78,11 +118,13 @@ ul {
 #main {
   height: 100vh;
   width: 100vw;
-  overflow: hidden;
+  overflow: auto;
   position: absolute;
   background-color: $darkest-blue;
   left: 0;
   top: 0;
+  display: flex;
+  flex-direction: column;
 }
 .footer {
   position: fixed;
@@ -91,6 +133,7 @@ ul {
   width: 100%;
   text-align: right;
   color: $medium-gray;
+  margin-top: auto;
 
   // No highlighting
   -webkit-touch-callout: none; /* iOS Safari */
@@ -122,7 +165,6 @@ ul {
   }
 }
 .objective {
-  margin-top: 82vh;
   margin-left: 1vw;
   color: $darkest-orange;
 }
@@ -160,7 +202,7 @@ ul {
   }
 }
 .no-highlighting {
-    // No highlighting
+  // No highlighting
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */
   -khtml-user-select: none; /* Konqueror HTML */
@@ -168,5 +210,36 @@ ul {
   -ms-user-select: none; /* Internet Explorer/Edge */
   user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome and Opera */
+}
+#left-half,
+#right-half {
+  width: 50vw;
+  display: inline-block;
+  float: left;
+}
+.level {
+  width: 10vw;
+  height: 5vh;
+  font-size: 1vw;
+  background-color: $light-blue;
+  color: $light-orange;
+  font-weight: bold;
+  outline: none;
+  border: none;
+  margin-top: 1vh;
+  cursor: pointer;
+  z-index: 22;
+
+  &.chosen {
+    background-color: $green;
+  }
+}
+#right-half .objective {
+  margin-left: 0;
+}
+#below-stage {
+  margin-top: 82vh;
+  width: 100%;
+  height: 18vh;
 }
 </style>

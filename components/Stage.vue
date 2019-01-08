@@ -6,7 +6,13 @@
       :nodeId="nodeLocation.nodeId"
       :radius="nodeRadius"
     ></Node>
-    <svg height="80vh" width="100vw" id="svg-lines">
+    <svg
+      height="80vh"
+      width="100vw"
+      id="svg-lines"
+      xmlns="http://www.w3.org/2000/svg"
+      version="1.1"
+    >
       <line
         v-for="connection in connections"
         :key="connection"
@@ -81,13 +87,10 @@ export default {
     this.randomizeValues();
 
     // Redraw svg on window resize
-    // window.addEventListener("resize", () => {
-    //   this.connections = [...this.connections];
-    //   // document.getElementById("svg-lines").style.display = "none";
-    //   // window.requestAnimationFrame(() => {
-    //   //   document.getElementById("svg-lines").style.display = "inline";
-    //   // });
-    // });
+    window.addEventListener("resize", () => {
+      this.scale = main.clientWidth / main.clientHeight;
+      this.createConnections();
+    });
   },
   methods: {
     ...mapActions([
@@ -511,7 +514,7 @@ export default {
 
       // Wait a bit and then change the top and left
       setTimeout(() => {
-      // Now loop through all of the moneys and change the positions
+        // Now loop through all of the moneys and change the positions
         for (let money of this.moneys) {
           money.currLeft = money.endingLeft;
           money.currTop = money.endingTop;
@@ -536,7 +539,7 @@ export default {
   watch: {
     movesLeft: {
       handler(newNum) {
-        if(!this.setUp) {
+        if (!this.setUp) {
           this.setUp = true;
           return;
         }
