@@ -55,7 +55,10 @@ export default {
       moneys: [],
 
       // Compare width to height of the screen
-      scale: 1
+      scale: 1,
+
+      // Ensure that everything's been set up
+      setUp: false
     };
   },
   beforeMount() {},
@@ -546,6 +549,11 @@ export default {
   watch: {
     movesLeft: {
       handler(newNum) {
+        if(!this.setUp) {
+          this.setUp = true;
+          return;
+        }
+
         // Check if you won
         if (this.allPositive()) {
           this.showWin();
