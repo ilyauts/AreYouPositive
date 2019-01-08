@@ -76,7 +76,12 @@ export default {
   methods: {
     ...mapActions(["changeLevel"]),
     changeLevelWrapper(e) {
-      this.changeLevel(e.target.dataset.level);
+      this.changeLevel({
+        level: e.target.dataset.level,
+        numNodes: this.levelOptions.find(
+          opt => opt.level === e.target.dataset.level
+        ).numNodes
+      });
     },
     reload() {
       location.reload(true);

@@ -55,7 +55,6 @@ export default {
   data() {
     return {
       nodeRadius: 5,
-      numNodes: 5,
       nodeLocations: [],
       connections: [],
       moneys: [],
@@ -70,27 +69,7 @@ export default {
   beforeMount() {},
   beforeDestroy() {},
   mounted() {
-    let main = document.getElementById("main");
-
-    // Determine x where xvh = 1vw
-    this.scale = main.clientWidth / main.clientHeight;
-
-    // Repeat while loners exist or we've tried for long enough
-    let generationCount = 0;
-    do {
-      this.generateNodes.call(this);
-
-      generationCount++;
-    } while (!this.noLoners() && generationCount < 100);
-
-    // Randomize node values
-    this.randomizeValues();
-
-    // Redraw svg on window resize
-    window.addEventListener("resize", () => {
-      this.scale = main.clientWidth / main.clientHeight;
-      this.createConnections();
-    });
+    this.startFromTheTop();
   },
   methods: {
     ...mapActions([
@@ -102,6 +81,29 @@ export default {
       "showWin",
       "nukeNodes"
     ]),
+    startFromTheTop() {
+      let main = document.getElementById("main");
+
+      // Determine x where xvh = 1vw
+      this.scale = main.clientWidth / main.clientHeight;
+
+      // Repeat while loners exist or we've tried for long enough
+      let generationCount = 0;
+      do {
+        this.generateNodes.call(this);
+
+        generationCount++;
+      } while (!this.noLoners() && generationCount < 100);
+
+      // Randomize node values
+      this.randomizeValues();
+
+      // Redraw svg on window resize
+      window.addEventListener("resize", () => {
+        this.scale = main.clientWidth / main.clientHeight;
+        this.createConnections();
+      });
+    },
     printLineNum(e) {
       let slope =
         (e.target.dataset.y1 - e.target.dataset.y2) /
@@ -533,7 +535,9 @@ export default {
       getNodes: "getNodes",
       movesLeft: "getActionsLeft",
       lastAction: "lastAction",
-      lastActionNode: "lastActionNode"
+      lastActionNode: "lastActionNode",
+      getLevel: "getLevel",
+      numNodes: "numNodes"
     })
   },
   watch: {
@@ -556,6 +560,12 @@ export default {
 
         // Handle animation
         this.animateMoney();
+      }
+    },
+    getLevel: {
+      handler(newLevel) {
+        this.setUp = false;
+        this.startFromTheTop();
       }
     }
   }

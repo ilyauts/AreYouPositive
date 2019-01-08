@@ -8,7 +8,8 @@ const defaultState = {
     lastAction: null,
     lastActionNode: null,
 
-    level: 'medium'
+    level: 'medium',
+    numNodes: 6
 };
 
 const getters = {
@@ -19,7 +20,8 @@ const getters = {
     showWin: (state) => state.showWin,
     lastAction: (state) => state.lastAction,
     lastActionNode: (state) => state.lastActionNode,
-    getLevel: (state) => state.level
+    getLevel: (state) => state.level,
+    numNodes: (state) => state.numNodes
 };
 
 const mutations = {
@@ -110,8 +112,9 @@ const mutations = {
         state = defaultState;
     },
 
-    changeLevel(state, level) {
+    changeLevel(state, {level, numNodes}) {
         if(['easy', 'medium', 'hard'].includes(level)) {
+            state.numNodes = numNodes;
             state.level = level;
         }
     }
@@ -149,8 +152,8 @@ const actions = {
         context.commit('nukeNodes');
     },
 
-    changeLevel: (context, level) => {
-        context.commit('changeLevel', level);
+    changeLevel: (context, obj) => {
+        context.commit('changeLevel', obj);
     }
 };
 
