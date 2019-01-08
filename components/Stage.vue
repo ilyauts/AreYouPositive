@@ -599,4 +599,7 @@ export default {
   position: absolute;
   width: 3vw;
 }
+svg {
+  position: absolute;
+}
 </style>
