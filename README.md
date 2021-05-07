@@ -6,7 +6,12 @@ Math game - try to get each node to be positive. Based on: [https://www.youtube.
 ## Installation
 
     npm i
-    npm run webpack
+
+    # Globally install webpack
+    npm i webpack -g
+
+    # Run webpack
+    webpack
 
 ## Run the game
 
